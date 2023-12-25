@@ -1,0 +1,11 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity or_gate is port (and_gate1, and_gate2, and_gate3 : in std_logic;
+			or_gate_output : out std_logic);
+end or_gate;
+
+architecture logic_or_gate of or_gate is
+begin
+or_gate_output <= and_gate1 or and_gate2 or and_gate3;
+end logic_or_gate;

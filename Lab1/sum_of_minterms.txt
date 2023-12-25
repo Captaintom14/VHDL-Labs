@@ -1,0 +1,48 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity sum_of_minterms is port (a,b,c : in std_logic;
+				output: out std_logic);
+end sum_of_minterms;
+
+
+-- declare the archictecture
+architecture logic_sum_of_minterms of sum_of_minterms is
+
+component and_gate port (A, B, C : in std_logic;
+			output_and_gate : out std_logic);
+end component; 
+
+component or_gate port (and_gate1, and_gate2, and_gate3 : in std_logic;
+			or_gate_output : out std_logic);
+end component; 
+
+signal output_result1, output_result2, output_result3, not_a, not_b, not_c : std_logic;
+
+
+
+-- declaring the architecture of the and_gate.vhd
+--for and_gate1_logic, and_gate2_logic, and_gate3_logic : and_gate use entity WORK.and_gate(logic_and_gate);
+
+-- declaring the architecture of the or_gate.vhd
+--for or_gate_logic : or_gate use entity Work.or_gate(logic_or_gate);
+
+
+-- begin the port maps
+begin
+
+not_a <= not a;
+not_b <= not b;
+
+-- declare the maps for the three and gates
+
+and_gate1_logic : and_gate port map (A => not_a, B => not_b, C => c, output_and_gate => output_result1);
+and_gate2_logic : and_gate port map (A => not_a, B => b, C => c, output_and_gate => output_result2);
+and_gate3_logic : and_gate port map (A => a, B => b, C => c, output_and_gate => output_result3); 
+
+-- declare the maps for the or gates
+
+or_gate_logic : or_gate port map (and_gate1 => output_result1, and_gate2 => output_result2, and_gate3 => output_result3,
+				  or_gate_output => output);
+
+end logic_sum_of_minterms;

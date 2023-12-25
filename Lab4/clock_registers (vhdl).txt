@@ -1,0 +1,110 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
+
+entity registers_min_max is port
+(din : in std_logic_vector (3 downto 0);
+ reset : in std_logic;
+ clk : in std_logic;
+ sel : in std_logic_vector (1 downto 0);
+ max_out : out std_logic_vector (3 downto 0);
+ min_out : out std_logic_vector (3 downto 0);
+ reg_out : out std_logic_vector (3 downto 0));
+
+end registers_min_max;
+
+architecture rtl of registers_min_max is
+ 
+signal r0,r1,r2,r3 : std_logic_vector (3 downto 0);
+signal MAX_REG, MIN_REG: std_logic_vector (3 downto 0);
+signal MAX_Q, MIN_Q : std_logic_vector (3 downto 0);
+signal next_MAX_Q, next_MIN_Q: std_logic_vector (3 downto 0);
+begin
+
+-- first part
+        process(din,clk,reset)
+         begin 
+             
+             if (reset = '1') then
+                  r0 <= "1000";
+                  r1 <= "1000";
+                  r2 <= "1000";
+                  r3 <= "1000";
+           
+             elsif (clk'event and clk = '1') then
+                 r0 <= din;
+                 r1 <= r0;
+                 r2 <= r1;
+                 r3 <= r2;
+             end if;
+            end process;                    		
+
+
+ -- the second part
+       
+        with sel select
+                 reg_out <= r0 when "00",
+                            r1 when "01",
+                            r2 when "10",
+                            r3 when others;
+
+
+-- the MAX part 
+
+                   process (r0,r1,r2,r3)
+                               begin
+                                      if (r0 > r1 and r0 > r2 and r0 > r3) then
+                                            MAX_REG <= r0;
+                                       elsif (r1 > r0 and r1 > r2 and r1 > r3) then
+                                             MAX_REG <= r1;
+
+                                       elsif (r2 > r0 and r2 > r1 and r2 > r3) then 
+                                             MAX_REG <= r2;
+                                       else
+                                             MAX_REG <= r3;
+
+                                          end if;
+                                          end process;
+
+-- The MIN Part
+              
+               process (r0,r1,r2,r3)
+                     begin 
+                             if (r0 < r1 and r0 < r2 and r0 < r3) then 
+                                    MIN_REG <= r0;
+                                    
+                             elsif (r1 < r0 and r1 < r2 and r1 < r3) then
+                                     MIN_REG <= r1;
+
+                             elsif (r2 < r0 and r2 < r1 and r2 < r3)then 
+                                    MIN_REG <= r2;
+                              else 
+                                     MIN_REG <= r3;
+
+                                  end if;
+                                  end process;
+
+-- The last part
+ 
+               process (clk, reset)
+                         begin
+                             if (reset = '1') then
+                               MAX_Q <= (others => '0');
+                               MIN_Q <= (others => '0');
+                             
+                           elsif (clk'event and clk = '1') then
+                             if (MIN_REG <= MIN_Q)then 
+                               MIN_Q <= MIN_REG;
+                              end if;
+
+                           if (MAX_REG >= MAX_Q) then
+                               MAX_Q <= MAX_REG;
+                             end if;
+                               end if;
+                              end process;            
+
+                      min_out <= MIN_REG;
+                      max_out <= MAX_REG;
+
+
+end rtl;
